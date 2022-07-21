@@ -57,4 +57,10 @@ export default class CompositeSequence extends BTComposite{
                 break
         }
     }
+
+    onConditionalAbort(childIndex:number){
+        this.index = childIndex
+        this.status = NodeStatus.Inactive
+    }
+
 }

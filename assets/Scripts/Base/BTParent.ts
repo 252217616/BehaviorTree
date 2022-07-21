@@ -27,7 +27,9 @@ export default abstract class BTParent  extends BTNode{
     //子节点执行
     abstract onChildExecuted(childStatus:NodeStatus):void
 
+    //条件中止
+    onConditionalAbort(childIndex:number){
 
-
+    }
 
 }

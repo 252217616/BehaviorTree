@@ -73,4 +73,9 @@ export default class CompositeRandomSelevtor extends BTComposite{
                 break
         }
     }
+
+    onConditionalAbort(childIndex:number){
+        this.shuffle()
+        this.status = NodeStatus.Inactive
+    }
 }

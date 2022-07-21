@@ -21,7 +21,7 @@ export default class ActionSkill extends BTAction {
     onStart() {
         super.onStart()
         this.startTime = game.totalTime
-        Blackboard.Instance.mp -= 20
+
         console.log("ActionSkill onStart")
     }
 
@@ -33,6 +33,7 @@ export default class ActionSkill extends BTAction {
     }
 
     onEnd() {
+        Blackboard.Instance.mp -= 20
         super.onEnd()
         console.log("ActionSkill onEnd")
     }
