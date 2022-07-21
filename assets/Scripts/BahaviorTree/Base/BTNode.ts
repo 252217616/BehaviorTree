@@ -1,4 +1,4 @@
-import {NodeStatus} from "db://assets/Scripts/Enums";
+import {NodeStatus} from "db://assets/Scripts/BahaviorTree/Enums";
 
 //基础节点
 export default abstract class BTNode {

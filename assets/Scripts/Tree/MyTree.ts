@@ -1,11 +1,11 @@
-import BTTree from "db://assets/Scripts/Base/BTTree";
-import CompositeSelector from "db://assets/Scripts/Biz/Composite/CompositeSelector";
+import BTTree from "db://assets/Scripts/BahaviorTree/Base/BTTree";
+import CompositeSelector from "db://assets/Scripts/BahaviorTree/Composite/CompositeSelector";
 import ConditionalMp from "db://assets/Scripts/Biz/Conditional/ConditionalMp";
 import ConditionalHp from "db://assets/Scripts/Biz/Conditional/ConditionalHp";
-import ActionWork from "db://assets/Scripts/Demo/Action/ActionWork";
-import ActionSleep from "db://assets/Scripts/Demo/Action/ActionSleep";
-import {AbortType} from "db://assets/Scripts/Enums";
-import CompositeParallel from "db://assets/Scripts/Biz/Composite/CompositeParallel";
+import ActionWork from "db://assets/Scripts/Biz/Action/ActionWork";
+import ActionSleep from "db://assets/Scripts/Biz/Action/ActionSleep";
+import {AbortType} from "db://assets/Scripts/BahaviorTree/Enums";
+import CompositeParallel from "db://assets/Scripts/BahaviorTree/Composite/CompositeParallel";
 
 export default class MyTree extends BTTree {
     constructor() {

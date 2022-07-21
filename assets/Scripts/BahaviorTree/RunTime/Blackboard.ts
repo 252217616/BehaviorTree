@@ -1,4 +1,4 @@
-import Singleton from "db://assets/Scripts/Demo/Base/Singleton";
+import Singleton from "db://assets/Scripts/BahaviorTree/RunTime/Base/Singleton";
 
 //黑板 数据中心
 export default class Blackboard extends Singleton{

@@ -1,6 +1,6 @@
-import {NodeStatus} from "db://assets/Scripts/Enums";
-import BTConditional from "db://assets/Scripts/Base/BTConditional";
-import Blackboard from "db://assets/Scripts/Demo/RunTime/Blackboard";
+import {NodeStatus} from "db://assets/Scripts/BahaviorTree/Enums";
+import BTConditional from "db://assets/Scripts/BahaviorTree/Base/BTConditional";
+import Blackboard from "db://assets/Scripts/BahaviorTree/RunTime/Blackboard";
 
 export default class ConditionalMp extends BTConditional{
 

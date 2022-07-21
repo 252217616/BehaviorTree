@@ -1,6 +1,6 @@
 import {game} from "cc";
-import BTAction from "db://assets/Scripts/Base/BTAction";
-import {NodeStatus} from "db://assets/Scripts/Enums";
+import BTAction from "db://assets/Scripts/BahaviorTree/Base/BTAction";
+import {NodeStatus} from "db://assets/Scripts/BahaviorTree/Enums";
 
 //睡眠
 export default class ActionSleep extends BTAction {

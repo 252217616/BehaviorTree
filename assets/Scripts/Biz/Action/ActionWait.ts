@@ -1,10 +1,9 @@
 import {game} from "cc";
-import BTAction from "db://assets/Scripts/Base/BTAction";
-import {NodeStatus} from "db://assets/Scripts/Enums";
-import Blackboard from "db://assets/Scripts/Demo/RunTime/Blackboard";
+import BTAction from "db://assets/Scripts/BahaviorTree/Base/BTAction";
+import {NodeStatus} from "db://assets/Scripts/BahaviorTree/Enums";
 
-
-export default class ActionWork extends BTAction {
+//等待 （技能前摇）
+export default class ActionWait extends BTAction {
 
     //持续时间
     private duration: number = 2000
@@ -21,7 +20,7 @@ export default class ActionWork extends BTAction {
     onStart() {
         super.onStart()
         this.startTime = game.totalTime
-        console.log("ActionWork onStart")
+        console.log("ActionWait onStart")
     }
 
     onUpdate() {
@@ -33,6 +32,6 @@ export default class ActionWork extends BTAction {
 
     onEnd() {
         super.onEnd()
-        console.log("ActionWork onEnd")
+        console.log("ActionWait onEnd")
     }
 }

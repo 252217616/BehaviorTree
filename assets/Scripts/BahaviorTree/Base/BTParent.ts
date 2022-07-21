@@ -1,5 +1,5 @@
-import BTNode from "db://assets/Scripts/Base/BTNode";
-import {NodeStatus} from "db://assets/Scripts/Enums";
+import BTNode from "db://assets/Scripts/BahaviorTree/Base/BTNode";
+import {NodeStatus} from "db://assets/Scripts/BahaviorTree/Enums";
 
 //基础父节点
 export default abstract class BTParent  extends BTNode{

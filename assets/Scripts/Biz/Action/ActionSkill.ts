@@ -1,10 +1,10 @@
 import {game} from "cc";
-import BTAction from "db://assets/Scripts/Base/BTAction";
-import {NodeStatus} from "db://assets/Scripts/Enums";
-import Blackboard from "db://assets/Scripts/Demo/RunTime/Blackboard";
+import BTAction from "db://assets/Scripts/BahaviorTree/Base/BTAction";
+import {NodeStatus} from "db://assets/Scripts/BahaviorTree/Enums";
+import Blackboard from "db://assets/Scripts/BahaviorTree/RunTime/Blackboard";
 
-//攻击
-export default class ActionAttack extends BTAction {
+//释放技能
+export default class ActionSkill extends BTAction {
 
     //持续时间
     private duration: number = 2000
@@ -21,8 +21,8 @@ export default class ActionAttack extends BTAction {
     onStart() {
         super.onStart()
         this.startTime = game.totalTime
-        Blackboard.Instance.hp -= 20
-        console.log("ActionAttack onStart")
+
+        console.log("ActionSkill onStart")
     }
 
     onUpdate() {
@@ -33,7 +33,8 @@ export default class ActionAttack extends BTAction {
     }
 
     onEnd() {
+        Blackboard.Instance.mp -= 20
         super.onEnd()
-        console.log("ActionAttack onEnd")
+        console.log("ActionSkill onEnd")
     }
 }

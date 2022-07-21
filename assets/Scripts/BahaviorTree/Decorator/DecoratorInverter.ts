@@ -1,6 +1,7 @@
-import {NodeStatus} from "db://assets/Scripts/Enums";
-import BTDecorator from "db://assets/Scripts/Base/BTDecorator";
+import {NodeStatus} from "db://assets/Scripts/BahaviorTree/Enums";
+import BTDecorator from "db://assets/Scripts/BahaviorTree/Base/BTDecorator";
 
+//反转节点
 export default class DecoratorInverter extends BTDecorator{
     canExecute(): boolean {
         return this.status == NodeStatus.Inactive || this.status === NodeStatus.Running;
@@ -9,10 +10,7 @@ export default class DecoratorInverter extends BTDecorator{
     onChildExecuted(childStatus: NodeStatus,_:number): void {
         this.status = childStatus
     }
-    //
-    // onUpdate(){
-    //     return this.decorator(this.childrens[0].run())
-    // }
+
 
     decorator(status:NodeStatus) {
         switch (status) {

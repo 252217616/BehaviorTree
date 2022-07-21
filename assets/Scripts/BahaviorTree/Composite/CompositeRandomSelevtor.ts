@@ -1,5 +1,5 @@
-import {NodeStatus} from "db://assets/Scripts/Enums";
-import BTComposite from "db://assets/Scripts/Base/BTComposite";
+import {NodeStatus} from "db://assets/Scripts/BahaviorTree/Enums";
+import BTComposite from "db://assets/Scripts/BahaviorTree/Base/BTComposite";
 
 //选择随机节点，所有子节点随机执行，当有一个返回成功则中止返回成功，全部节点返回失败，则该节点返回失败
 export default class CompositeRandomSelevtor extends BTComposite{

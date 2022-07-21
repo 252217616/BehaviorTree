@@ -1,5 +1,5 @@
-import {NodeStatus} from "db://assets/Scripts/Enums";
-import BTComposite from "db://assets/Scripts/Base/BTComposite";
+import {NodeStatus} from "db://assets/Scripts/BahaviorTree/Enums";
+import BTComposite from "db://assets/Scripts/BahaviorTree/Base/BTComposite";
 
 //并行节点，所有子节点按同时执行，当有一个返回失败，则返回失败，全部成功则成功
 export default class CompositeParallel extends BTComposite{

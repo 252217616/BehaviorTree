@@ -1,13 +1,13 @@
 import {_decorator, Component} from 'cc';
-import BTTree from "db://assets/Scripts/Base/BTTree";
-import MyTree from "db://assets/Scripts/Biz/Tree/MyTree";
-import BTNode from "db://assets/Scripts/Base/BTNode";
-import BTParent from "db://assets/Scripts/Base/BTParent";
-import {AbortType, NodeStatus} from "db://assets/Scripts/Enums";
-import BTComposite from "db://assets/Scripts/Base/BTComposite";
-import BTConditional from "db://assets/Scripts/Base/BTConditional";
-import BTDecorator from "db://assets/Scripts/Base/BTDecorator";
-import Blackboard from "db://assets/Scripts/Demo/RunTime/Blackboard";
+import BTTree from "db://assets/Scripts/BahaviorTree/Base/BTTree";
+import MyTree from "db://assets/Scripts/Tree/MyTree";
+import BTNode from "db://assets/Scripts/BahaviorTree/Base/BTNode";
+import BTParent from "db://assets/Scripts/BahaviorTree/Base/BTParent";
+import {AbortType, NodeStatus} from "db://assets/Scripts/BahaviorTree/Enums";
+import BTComposite from "db://assets/Scripts/BahaviorTree/Base/BTComposite";
+import BTConditional from "db://assets/Scripts/BahaviorTree/Base/BTConditional";
+import BTDecorator from "db://assets/Scripts/BahaviorTree/Base/BTDecorator";
+import Blackboard from "db://assets/Scripts/BahaviorTree/RunTime/Blackboard";
 
 const {ccclass, property} = _decorator;
 
