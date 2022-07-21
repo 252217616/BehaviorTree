@@ -25,11 +25,21 @@ export default abstract class BTParent  extends BTNode{
     abstract canExecute():boolean
 
     //子节点执行
-    abstract onChildExecuted(childStatus:NodeStatus):void
+    abstract onChildExecuted(childStatus:NodeStatus,index:number):void
 
     //条件中止
     onConditionalAbort(childIndex:number){
+    }
+
+    //能否运行的并行节点
+    canRunParallelChildren(){
+        return false
+    }
+
+    //
+    onChildStarted(){
 
     }
+
 
 }

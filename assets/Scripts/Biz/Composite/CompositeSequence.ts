@@ -35,7 +35,7 @@ export default class CompositeSequence extends BTComposite{
         return this.index < this.childrens.length && this.status !== NodeStatus.Failure;
     }
 
-    onChildExecuted(childStatus: NodeStatus): void {
+    onChildExecuted(childStatus: NodeStatus,_:number): void {
         switch (childStatus){
             case NodeStatus.Inactive:
                 break;

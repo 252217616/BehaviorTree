@@ -13,12 +13,12 @@ const {ccclass, property} = _decorator;
 
 @ccclass('BehaviorManager')
 export class BehaviorManager extends Component {
-    isCanReStart: boolean = true
+    isCanReStart: boolean = false
     tree: BTTree
     //前序遍历保存行为树所有的节点
     nodeList: Array<BTNode> = []
     //运行栈 当前运行中的节点栈
-    activeStack: Array<number> = []
+    activeStack: Array<Array<number>> = []
     //每个节点的父节点再nodeList上的索引
     parentIndex: Array<number> = []
     //每个节点的子元素在nodeList上的索引
@@ -36,24 +36,29 @@ export class BehaviorManager extends Component {
 
     start() {
         this.enableBehacvior()
+        this.scheduleOnce(()=>{
+            console.log("加血")
+            Blackboard.Instance.hp = 1000
+        },1)
     }
 
 
     private restart() {
         if (this.isCanReStart) {
             console.log("重启行为树")
-            this.pushNode(0)
             this.removeChildConditionalReevalute(-1)
+            this.pushNode(0, 0)
         }
     }
 
     private enableBehacvior() {
         this.tree = new MyTree()
+        this.activeStack.push([])
         this.parentIndex.push(-1)
         this.relativeChildIndex.push(-1)
         this.parentCompositeIndex.push(-1)
         this.addToNodeList(this.tree.root, {parentCompositeIndex: -1})
-        this.pushNode(0)
+        this.pushNode(0, 0)
     }
 
     private addToNodeList(node: BTNode, data: { parentCompositeIndex: number }) {
@@ -107,62 +112,84 @@ export class BehaviorManager extends Component {
     tick() {
         //条件判断 并回滚
         this.reevaluateConftionalNode()
-        //上一次执行的节点索引
-        let preIndex = -1
-        //上一次执行的节点状态
-        let preStatus = NodeStatus.Inactive
-        //当运行栈中有节点时执行
-        while (this.activeStack.length) {
-            //找出当前运行节点的索引
-            const curIndex = this.activeStack[this.activeStack.length - 1]
-            //如果本次和上次一样则跳过（防止重复执行）
-            if (preIndex === curIndex) {
-                break
+        //遍历所有的运行栈
+        for (let i = this.activeStack.length - 1; i >= 0; i--) {
+            //拿到运行栈
+            const stack = this.activeStack[i];
+            //上一次执行的节点索引
+            let preIndex = -1
+            //上一次执行的节点状态
+            let preStatus = NodeStatus.Inactive
+            //当运行栈中有节点时执行
+            while (preStatus !== NodeStatus.Running && i < this.activeStack.length && stack.length) {
+                //找出当前运行节点的索引
+                const curIndex = stack[stack.length - 1]
+                //如果本次和上次一样则跳过（防止重复执行）
+                if (preIndex === curIndex) {
+                    break
+                }
+                //更新前置节点
+                preIndex = curIndex
+                //执行节点，并更新前置节点状态
+                preStatus = this.runNode(curIndex, i, preStatus)
             }
-            //更新前置节点
-            preIndex = curIndex
-            //执行节点，并更新前置节点状态
-            preStatus = this.runNode(curIndex, preStatus)
+
         }
+
     }
 
-    runNode(index: number, preStatus: NodeStatus) {
+    runNode(index: number, stackIndex: number, preStatus: NodeStatus) {
         //将节点推入运行栈，并执行节点的onStart方法（内部有判断，如果当前节点已经在运行栈中就不执行）
-        this.pushNode(index)
+        this.pushNode(index, stackIndex)
         //拿到当前节点
         const node = this.nodeList[index]
         let status = preStatus
         if (node instanceof BTParent) {
             //如果是父节点，执行父节点逻辑
-            status = this.runParentNode(index, preStatus)
+            status = this.runParentNode(index, stackIndex, preStatus)
+            if (node.canRunParallelChildren()) {
+                status = node.status
+            }
         } else {
             //普通节点执行节点的onUpdate方法
             status = node.onUpdate();
         }
         //如果节点已经执行完毕，非running状态，则推出运行栈，并执行onEnd方法，和父节点的onChildExecuted方法，改变运行孩子索引和父节点的状态
         if (status !== NodeStatus.Running) {
-            status = this.popNode(index, status)
+            status = this.popNode(index, stackIndex, status)
         }
         //将本次节点运行的状态返回
         return status
 
     }
 
-    runParentNode(index: number, preStatus: NodeStatus) {
+    runParentNode(index: number, stackIndex: number, preStatus: NodeStatus) {
         //强转为父节点
         const parentNode = this.nodeList[index] as BTParent
-        let childstatus = NodeStatus.Inactive
-        //如果父节点可执行，并且状态非running 则继续执行
-        while (parentNode.canExecute() && childstatus !== NodeStatus.Running) {
-            //执行孩子节点
-            childstatus = preStatus = this.runNode(this.childrenIndex[index][parentNode.index], preStatus)
+        if (!parentNode.canRunParallelChildren() || parentNode.status !== NodeStatus.Running) {
+            let childStatus = NodeStatus.Inactive
+            //如果父节点可执行，并且状态非running 则继续执行
+            while (parentNode.canExecute() && (childStatus !== NodeStatus.Running || parentNode.canRunParallelChildren())) {
+                const childIndex = parentNode.index
+                //如果是并行节点，增加运行栈将任务都推送进去
+                if (parentNode.canRunParallelChildren()) {
+                    this.activeStack.push([])
+                    stackIndex = this.activeStack.length - 1
+                    //增加parentNode index
+                    parentNode.onChildStarted()
+                }
+                //执行孩子节点
+                childStatus = preStatus = this.runNode(this.childrenIndex[index][childIndex],stackIndex, preStatus)
+            }
         }
+
         return preStatus
     }
 
-    pushNode(index: number) {
-        if (this.activeStack.length === 0 || this.activeStack[this.activeStack.length - 1] !== index) {
-            this.activeStack.push(index)
+    pushNode(index: number, stackIndex: number) {
+        const stack = this.activeStack[stackIndex]
+        if (stack.length === 0 || stack[stack.length - 1] !== index) {
+            stack.push(index)
             const node = this.nodeList[index]
             console.log("pushNode ", node)
             //执行初始化方法
@@ -170,9 +197,10 @@ export class BehaviorManager extends Component {
         }
     }
 
-    popNode(index: number, status: NodeStatus) {
+    popNode(index: number, stackIndex: number, status: NodeStatus,popChildren = true) {
+        const stack = this.activeStack[stackIndex]
         //当前运行节点出栈
-        this.activeStack.pop()
+        stack.pop()
         //拿到当前节点
         const node = this.nodeList[index]
         //执行onEnd方法
@@ -216,13 +244,13 @@ export class BehaviorManager extends Component {
                 status = node.decorator(status)
             }
             //运行子状态影响父状态的方法
-            parentNode.onChildExecuted(status)
+            parentNode.onChildExecuted(status, this.relativeChildIndex[index])
         }
 
         //如果当前节点是组合节点退出
         if (node instanceof BTComposite) {
             //如果条件重新评估 只影响自己 或者 没有，或者当前运行栈已经没有运行节点了，则清空以当前节点为父节点的的条件重评估
-            if (node.abortType === AbortType.Self || node.abortType === AbortType.None || !this.activeStack.length) {
+            if (node.abortType === AbortType.Self || node.abortType === AbortType.None || !stack.length) {
                 this.removeChildConditionalReevalute(index)
                 //如果当前节点的重评估状态为低优先级，或者Both，则要将当前节点为父节点的条件重评估，父节点向上移动
             } else if (node.abortType === AbortType.LowPriority || node.abortType === AbortType.Both) {
@@ -247,19 +275,52 @@ export class BehaviorManager extends Component {
                 }
             }
         }
+        //并行节点返回失败将其他节点pop出去
+        console.log(status,node)
+        if(popChildren){
+            //拿到右边的运行栈
+            for (let i = this.activeStack.length - 1; i < stackIndex; i--) {
+                const stack = this.activeStack[i];
+                if(stack.length >= 0 && this.isParentNode(index,stack[stack.length-1])){
+                    for (let j = stack.length -1; j >= 0; j--) {
+                        this.popNode(stack[stack.length-1],i,NodeStatus.Failure,false)
+
+                    }
+                }
+
+            }
+        }
+
+
         //如果当前没有可以运行的节点了则重新开始行为树
-        if (!this.activeStack.length) {
-            this.restart()
+        if(stack.length === 0){
+            if(stackIndex === 0){
+                //所有运行栈都运行完成了
+                this.restart()
+            }else {
+                //当前栈运行完毕，其他栈还有 删除当前栈
+                this.activeStack.splice(stackIndex,1)
+            }
         }
         //返回状态
         return status
+    }
+
+    private isParentNode(parentIndex:number,childIndex:number) {
+        for (let i = childIndex; i !== -1; i = this.parentIndex[i]) {
+            if(i === parentIndex){
+                return true
+            }
+        }
+        return false
+
     }
 
     private removeChildConditionalReevalute(index: number) {
         for (let i = this.conditionalReevaluateList.length - 1; i >= 0; i--) {
             const cur = this.conditionalReevaluateList[i];
             if (cur.compositeIndex === index) {
-                console.log("移除conditionalReevaluate",cur)
+                console.log("移除conditionalReevaluate", cur)
                 this.conditionalReevaluateMap.delete(cur.index);
                 this.conditionalReevaluateList.splice(i, 1)
             }
@@ -280,20 +341,32 @@ export class BehaviorManager extends Component {
             if (status === preStatus) {
                 continue
             }
-            //首先找到当前节点和条件变化的节点的共同父节点
-            let curNodeIndex = this.activeStack[this.activeStack.length - 1]
-            const commonParentIndex = this.findCommonParentIndex(curNodeIndex, index)
-            //1、把当前节点的所有父节点退出运行栈
-            while (curNodeIndex !== -1 && curNodeIndex !== commonParentIndex) {
-                this.popNode(curNodeIndex, NodeStatus.Failure)
-                curNodeIndex = this.parentIndex[curNodeIndex]
+
+            for (let j = this.activeStack.length -1; j >= 0; j--) {
+                const stack = this.activeStack[j];
+                //首先找到当前节点和条件变化的节点的共同父节点
+                let curNodeIndex = stack[stack.length - 1]
+                const commonParentIndex = this.findCommonParentIndex(curNodeIndex, index)
+                if(this.isParentNode(compositeIndex,commonParentIndex)){
+                    const stackLen = this.activeStack.length
+                    //1、把当前节点的所有父节点退出运行栈
+                    while (curNodeIndex !== -1 && curNodeIndex !== commonParentIndex && stackLen === this.activeStack.length) {
+                        this.popNode(curNodeIndex,j, NodeStatus.Failure,false)
+                        curNodeIndex = this.parentIndex[curNodeIndex]
+                    }
+                }
+
             }
+
             //2、把公共节点下最顶级的父节点的右侧的条件重评估移除
             //倒序遍历 j -》 i的所有重评估对象都要删掉
             for (let j = this.conditionalReevaluateList.length - 1; j >= i; j--) {
                 const curCR = this.conditionalReevaluateList[j];
-                this.conditionalReevaluateMap.delete(curCR.index)
-                this.conditionalReevaluateList.splice(j, 1)
+                //只有当前重评估节点的父组合节点是重评估的父节点才可以删除
+                if(this.isParentNode(compositeIndex,curCR.index)){
+                    this.conditionalReevaluateMap.delete(curCR.index)
+                    this.conditionalReevaluateList.splice(j, 1)
+                }
             }
             //3、当前生效的条件重评估对象同一组合下的条件重评估对象停止并删除
             //当前重评估对象的父组合节点
@@ -312,10 +385,10 @@ export class BehaviorManager extends Component {
             }
             //4、当前重评估的父节点到公共的父节点要重置内部的执行索引
             const conditionalParentIndex = []
-            for (let j = this.parentIndex[index]; j != commonParentIndex; j = this.parentIndex[j]) {
+            for (let j = this.parentIndex[index]; j != compositeIndex; j = this.parentIndex[j]) {
                 conditionalParentIndex.push(j)
             }
-            conditionalParentIndex.push(commonParentIndex)
+            conditionalParentIndex.push(compositeIndex)
             for (let j = conditionalParentIndex.length - 1; j >= 0; j--) {
                 const parentNode = this.nodeList[conditionalParentIndex[j]] as BTParent
                 if (j === 0) {

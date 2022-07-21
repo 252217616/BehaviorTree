@@ -6,6 +6,6 @@ export default class Blackboard extends Singleton{
         return super.GetInstance<Blackboard>()
     }
 
-    hp = 100
-    mp = 100
+    hp = 0
+    mp = 0
 }

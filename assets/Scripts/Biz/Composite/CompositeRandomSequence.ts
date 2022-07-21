@@ -54,7 +54,7 @@ export default class CompositeRandomSequence extends BTComposite{
     }
 
 
-    onChildExecuted(childStatus: NodeStatus): void {
+    onChildExecuted(childStatus: NodeStatus,_:number): void {
         switch (childStatus){
             case NodeStatus.Inactive:
                 break;

@@ -2,7 +2,16 @@ import {NodeStatus} from "db://assets/Scripts/Enums";
 
 //基础节点
 export default abstract class BTNode {
-    status:NodeStatus = NodeStatus.Inactive
+    private _status:NodeStatus = NodeStatus.Inactive
+
+
+    get status(){
+        return this._status
+    }
+
+    set status(status:NodeStatus){
+        this._status = status
+    }
 
     run(){
         if(this.status === NodeStatus.Inactive){

@@ -51,7 +51,7 @@ export default class CompositeRandomSelevtor extends BTComposite{
         return this.executionOrder.length && this.status !== NodeStatus.Success;
     }
 
-    onChildExecuted(childStatus: NodeStatus): void {
+    onChildExecuted(childStatus: NodeStatus,_:number): void {
         switch (childStatus){
             case NodeStatus.Inactive:
                 break;

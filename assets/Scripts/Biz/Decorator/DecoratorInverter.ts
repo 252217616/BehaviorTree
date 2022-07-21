@@ -6,7 +6,7 @@ export default class DecoratorInverter extends BTDecorator{
         return this.status == NodeStatus.Inactive || this.status === NodeStatus.Running;
     }
 
-    onChildExecuted(childStatus: NodeStatus): void {
+    onChildExecuted(childStatus: NodeStatus,_:number): void {
         this.status = childStatus
     }
     //
