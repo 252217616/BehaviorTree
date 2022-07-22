@@ -281,7 +281,7 @@ export class BehaviorManager extends Component {
             //拿到右边的运行栈
             for (let i = this.activeStack.length - 1; i < stackIndex; i--) {
                 const stack = this.activeStack[i];
-                if(stack.length >= 0 && this.isParentNode(index,stack[stack.length-1])){
+                if(stack.length > 0 && this.isParentNode(index,stack[stack.length-1])){
                     for (let j = stack.length -1; j >= 0; j--) {
                         this.popNode(stack[stack.length-1],i,NodeStatus.Failure,false)
 
